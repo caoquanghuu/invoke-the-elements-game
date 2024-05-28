@@ -61,6 +61,9 @@ export class GamePlayController {
             this._removeObject(element, this._usingElements);
         });
         this._hardLevel = 0;
+        this._usingSkills = [];
+        this._usingElements = [];
+        this._invokedSkillName = null;
     }
 
     /**
