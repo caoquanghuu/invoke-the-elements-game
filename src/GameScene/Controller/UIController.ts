@@ -1,5 +1,5 @@
 
-import { DisplayScoreFn, GetPlayerScoreFn, ReleaseObjectFn, ReturnObjectFn } from '../Type';
+import { DisplayScoreFn, GetPlayerScoreFn, ReleaseObjectFn } from '../Type';
 import { AppConstants } from '../Constants';
 import Emitter, { HardLevel } from '../Util';
 import { Text, TextStyle } from '@pixi/text';
@@ -8,17 +8,16 @@ import { BaseObject } from '../BaseObject';
 
 export class UIController {
     private _releaseObjectCallBack: ReleaseObjectFn;
-    private _returnObjectCallBack: ReturnObjectFn;
     private _getPlayerScoreCallBack: GetPlayerScoreFn;
     private _displayScoreCallBack: DisplayScoreFn;
     private _mainMenuBackGround: BaseObject;
     private _gamePlayBackGround: BaseObject;
     private _gameOverBackGround: BaseObject;
+    private _hardLevelPlaying: HardLevel;
 
-    constructor(releaseObjectFn: ReleaseObjectFn, returnObjectFn: ReturnObjectFn, getPlayerScoreFn: GetPlayerScoreFn, displayScoreFn: DisplayScoreFn) {
+    constructor(releaseObjectFn: ReleaseObjectFn, getPlayerScoreFn: GetPlayerScoreFn, displayScoreFn: DisplayScoreFn) {
         this._useEventEffect();
         this._releaseObjectCallBack = releaseObjectFn;
-        this._returnObjectCallBack = returnObjectFn;
         this._getPlayerScoreCallBack = getPlayerScoreFn;
         this._displayScoreCallBack = displayScoreFn;
 
@@ -41,6 +40,7 @@ export class UIController {
         // stop update
         Emitter.emit(AppConstants.eventName.setUpdateStatus, false);
 
+        // create texts and event of them
         this._createText(AppConstants.text.title, AppConstants.position.titleText, AppConstants.textStyle.title);
         this._createText(AppConstants.text.choseHardLevel, AppConstants.position.hardLevelOptionText, AppConstants.textStyle.normalText);
 
@@ -59,12 +59,15 @@ export class UIController {
 
         easyLevel.on('pointertap', () => {
             Emitter.emit(AppConstants.eventName.playGame, HardLevel.easy);
+            this._hardLevelPlaying = HardLevel.easy;
         });
         normalLevel.on('pointerdown', () => {
             Emitter.emit(AppConstants.eventName.playGame, HardLevel.normal);
+            this._hardLevelPlaying = HardLevel.normal;
         });
         hardLevel.on('pointerdown', () => {
             Emitter.emit(AppConstants.eventName.playGame, HardLevel.hard);
+            this._hardLevelPlaying = HardLevel.hard;
         });
     }
 
@@ -81,17 +84,37 @@ export class UIController {
         Emitter.emit(AppConstants.eventName.setUpdateStatus, true);
     }
 
-    private _displayGameOver() {
+    private _displayGameOver(): void {
         // stop update
         Emitter.emit(AppConstants.eventName.setUpdateStatus, false);
         Emitter.emit(AppConstants.eventName.removeFromScene, this._mainMenuBackGround.sprite);
         Emitter.emit(AppConstants.eventName.addToScene, this._gameOverBackGround.sprite);
 
+        // create texts
         this._createText(AppConstants.text.gameOver, AppConstants.position.gameOverTitle, AppConstants.textStyle.title);
         this._createText(AppConstants.text.yourScore, AppConstants.position.finalScoreText, AppConstants.textStyle.normalText);
         const score = this._getPlayerScoreCallBack();
         this._createText(`${score}`, AppConstants.position.scoreText, AppConstants.textStyle.finalScoreText);
-        const playAgain = this._createText(AppConstants.text.playAgain, AppConstants.position.playAgainText, AppConstants.textStyle.normalText);
+
+        let playedLevel: string;
+        switch (this._hardLevelPlaying) {
+            case 0: {
+                playedLevel = AppConstants.text.easyLevel;
+                break;
+            }
+            case 1: {
+                playedLevel = AppConstants.text.normalLevel;
+                break;
+            }
+            case 2: {
+                playedLevel = AppConstants.text.hardLevel;
+                break;
+            }
+            default:
+        }
+        this._createText(`${AppConstants.text.playedWithLevel} ${playedLevel}`, AppConstants.position.playedWithLevelText, AppConstants.textStyle.normalText);
+
+        const playAgain = this._createText(AppConstants.text.playAgain, AppConstants.position.playAgainText, AppConstants.textStyle.hardLevelText);
         playAgain.cursor = 'pointer';
         playAgain.eventMode = 'static';
         playAgain.on('pointertap', () => {

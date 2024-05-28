@@ -6,6 +6,7 @@ export class ObjectPool {
 
     constructor() {
 
+        // create element objects
         for (let i = 0; i < AppConstants.maxElementPool; i++) {
 
             const quas = new BaseObject(AppConstants.elementName.quas);
@@ -15,6 +16,7 @@ export class ObjectPool {
             this._objectsPool.push(quas, wex, exort);
         }
 
+        // craete skill objects
         for (let i = 0; i < AppConstants.maxSkillPool; i ++) {
             const coldSnap = new BaseObject(AppConstants.skillName.coldSnap);
             const ghostWalk = new BaseObject(AppConstants.skillName.ghostWalk);
@@ -26,10 +28,10 @@ export class ObjectPool {
             const forgeSpirit = new BaseObject(AppConstants.skillName.forgeSpirit);
             const chaosMeteor = new BaseObject(AppConstants.skillName.chaosMeteor);
             const deafeningBlast = new BaseObject(AppConstants.skillName.deafeningBlast);
-
             this._objectsPool.push(coldSnap, ghostWalk, iceWall, EMP, tornado, alacrity, sunStrike, forgeSpirit, chaosMeteor, deafeningBlast);
         }
 
+        // create number objects
         for (let i = 0; i < 10; i++) {
             for (let n = 0; n < AppConstants.maxNumberPool; n ++) {
                 const number = new BaseObject(`score-number-${i}`);

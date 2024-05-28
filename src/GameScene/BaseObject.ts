@@ -38,7 +38,7 @@ export class BaseObject {
         this._speed = speed;
     }
 
-    public update(deltaTime: number) {
+    public update(deltaTime: number): void {
         if (this._speed !== 0) {
             this.position.y = (this.position.y) + ((this._speed * deltaTime) / 1000);
         }

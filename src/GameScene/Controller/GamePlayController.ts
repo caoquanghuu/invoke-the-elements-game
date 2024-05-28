@@ -26,6 +26,7 @@ export class GamePlayController {
     }
 
     private _init() {
+        // create keyboard event
         const quas = keyboard(AppConstants.keyboardEvent.quas);
         const exort = keyboard(AppConstants.keyboardEvent.exort);
         const wex = keyboard(AppConstants.keyboardEvent.wex);
@@ -45,9 +46,13 @@ export class GamePlayController {
             this._invokeElements();
         };
 
+        // display game play back ground
         Emitter.emit(AppConstants.eventName.displayGamePlay, null);
     }
 
+    /**
+     * method to reset the game play, which will remove objects existing and other to default
+     */
     public reset() {
         this._usingSkills.forEach(skill => {
             this._removeObject(skill, this._usingSkills);
@@ -58,10 +63,14 @@ export class GamePlayController {
         this._hardLevel = 0;
     }
 
+    /**
+     * method to _invoke element when player trigger invoke
+     */
     private _invokeElements() {
         let invokedElementCode: number = 0;
         let skillName: string;
 
+        // use elements code to calculate what skill will be create
         this._usingElements.forEach(element => {
             const id = element.id;
             switch (id) {
@@ -94,6 +103,11 @@ export class GamePlayController {
         }
     }
 
+    /**
+     * method will create skill and set position and speed for that skill
+     * @param speed speed drop of skill
+     * @param position position of skill begin drop
+     */
     private _createSkills(speed: number, position: IPointData) {
         const randomSkillName = randomSkill();
         const skill = this._releaseObjectCallBack(randomSkillName);
@@ -101,39 +115,52 @@ export class GamePlayController {
         skill.position = position;
         skill.sprite.width = AppConstants.iconSize.width;
         skill.sprite.height = AppConstants.iconSize.height;
+        Emitter.emit(AppConstants.eventName.addToScene, skill.sprite);
 
         this._usingSkills.push(skill);
-        Emitter.emit(AppConstants.eventName.addToScene, skill.sprite);
     }
 
+    /**
+     * method to create elements when player trigger
+     * @param elementName type of element want create
+     * @returns
+     */
     private _createElements(elementName: string) {
+        // call get element from object pool
         const element = this._releaseObjectCallBack(elementName);
+
+        // set default position
         element.position = AppConstants.position.element1;
         element.sprite.width = AppConstants.iconSize.width;
         element.sprite.height = AppConstants.iconSize.height;
+
+        // add that element to array
         this._usingElements.unshift(element);
         Emitter.emit(AppConstants.eventName.addToScene, element.sprite);
 
+        // check status of current using element and set position for it
         switch (this._usingElements.length) {
             case 0:
-                return;
+                break;
             case 1:
-                return;
+                break;
             case 2:
                 this._usingElements[1].position = AppConstants.position.element2;
-                return;
+                break;
             case 3:
                 this._usingElements[1].position = AppConstants.position.element2;
                 this._usingElements[2].position = AppConstants.position.element3;
-                return;
+                break;
             case 4:
+                // when elements more than 3 elements, the last element will be remove and set position for remain elements
                 this._usingElements[1].position = AppConstants.position.element2;
                 this._usingElements[2].position = AppConstants.position.element3;
 
-                const removedElement = this._usingElements.pop();
-                Emitter.emit(AppConstants.eventName.removeFromScene, removedElement.sprite);
-                this._returnObjectCallBack(removedElement);
-
+                const elementToRemove = this._usingElements.pop();
+                Emitter.emit(AppConstants.eventName.removeFromScene, elementToRemove.sprite);
+                this._returnObjectCallBack(elementToRemove);
+                break;
+            default:
         }
 
     }
@@ -146,7 +173,11 @@ export class GamePlayController {
         this._hardLevel = hardLevel;
     }
 
-    private _dropSkills() {
+    /**
+     * method to drop skill base on hard level
+     * @returns default
+     */
+    private _dropSkills(): void {
         switch (this._hardLevel) {
             case HardLevel.easy:
             {
@@ -172,6 +203,11 @@ export class GamePlayController {
         }
     }
 
+    /**
+     * method to remove an object from array list and return it to object pool
+     * @param objectToRemove object need remove
+     * @param objectArray the array which the object existing
+     */
     private _removeObject(objectToRemove: BaseObject, objectArray: BaseObject[]) {
         this._returnObjectCallBack(objectToRemove);
         const i = objectArray.findIndex(object => object === objectToRemove);
@@ -180,21 +216,25 @@ export class GamePlayController {
     }
 
     public update(deltaTime: number) {
+        // drop skill each time count
         this._timeCount += deltaTime;
         if (this._timeCount > AppConstants.timeDropSkill) {
             this._timeCount -= AppConstants.timeDropSkill;
             this._dropSkills();
         }
 
+        // check skill
         this._usingSkills.forEach(skill => {
             skill.update(deltaTime);
 
+            // if skill drop to max drop point will remove them and missed score will be increase
             if (skill.position.y > AppConstants.maxDropPoint) {
                 this._removeObject(skill, this._usingSkills);
 
                 this._plusScoreCallBack(1, false);
             }
 
+            // check if invoked skill match with existing skills
             if (this._invokedSkillName === skill.id) {
                 this._removeObject(skill, this._usingSkills);
                 this._plusScoreCallBack(1, true);

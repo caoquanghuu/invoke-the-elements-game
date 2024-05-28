@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Sprite } from 'pixijs';
+import { Sprite } from '@pixi/sprite';
 import { BaseObject } from './BaseObject';
 import { IPointData } from '@pixi/core';
 

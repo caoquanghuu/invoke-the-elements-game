@@ -66,7 +66,8 @@ export namespace AppConstants {
         hardLevel: 'Hard',
         gameOver: 'GGEZ',
         playAgain: 'Play Again?',
-        yourScore: 'Your Score:'
+        yourScore: 'Your Score:',
+        playedWithLevel: 'Played With Level:'
     };
 
     export const eventName = {
@@ -120,9 +121,10 @@ export namespace AppConstants {
         normalText: { x: 355, y: 400 },
         hardText: { x: 530, y: 400 },
         scoreText: { x: 370, y: 230 },
-        playAgainText: { x: 320, y: 300 },
+        playAgainText: { x: 320, y: 400 },
         gameOverTitle: { x: 310, y: 100 },
-        finalScoreText: { x: 320, y: 200 }
+        finalScoreText: { x: 320, y: 200 },
+        playedWithLevelText: { x: 250, y: 300 }
 
     };
 

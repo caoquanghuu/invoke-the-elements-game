@@ -31,15 +31,21 @@ export class GameScene extends Container {
 
         this._gamePlayController = new GamePlayController(this._releaseObject.bind(this), this._returnObject.bind(this), this._plusScore.bind(this));
 
-        this._UIController = new UIController(this._releaseObject.bind(this), this._returnObject.bind(this), this._getPlayerScore.bind(this), this._displayScore.bind(this));
+        this._UIController = new UIController(this._releaseObject.bind(this), this._getPlayerScore.bind(this), this._displayScore.bind(this));
 
         this._UIController.displayMainMenuGame();
     }
 
-    private _displayScore(isSuccessScore: boolean, positionDisplay: IPointData) {
+    /**
+     * method to display score
+     * @param isSuccessScore what type of score will be display
+     * @param positionDisplay position to display score
+     */
+    private _displayScore(isSuccessScore: boolean, positionDisplay: IPointData): void {
 
         let score: number = 0;
 
+        // remove old score if it have
         if (isSuccessScore) {
             score = this._playerScore;
 
@@ -81,12 +87,12 @@ export class GameScene extends Container {
         isSuccessScore ? this._playerScoreObjects = scoreObjectsArray : this._missedScoreObjects = scoreObjectsArray;
     }
 
-    private _plusScore(score: number, isSuccessScore: boolean) {
+    private _plusScore(score: number, isSuccessScore: boolean): void {
         if (isSuccessScore) {
-            this._playerScore += 1;
+            this._playerScore += score;
             this._displayScore(isSuccessScore, AppConstants.position.displaySuccessScore);
         } else {
-            this._missedScore += 1;
+            this._missedScore += score;
             this._displayScore(isSuccessScore, AppConstants.position.displayMissedScore);
         }
     }
@@ -95,19 +101,19 @@ export class GameScene extends Container {
         return this._objectPool.releaseObject(id);
     }
 
-    private _returnObject(object: BaseObject) {
+    private _returnObject(object: BaseObject): void {
         this._objectPool.returnObject(object);
     }
 
-    private _addToScene(sprite: Sprite) {
+    private _addToScene(sprite: Sprite): void {
         this.addChild(sprite);
     }
 
-    private _removeFromScene(sprite: Sprite) {
+    private _removeFromScene(sprite: Sprite): void {
         this.removeChild(sprite);
     }
 
-    private _useEventEffect() {
+    private _useEventEffect(): void {
         Emitter.on(AppConstants.eventName.addToScene, this._addToScene.bind(this));
         Emitter.on(AppConstants.eventName.removeFromScene, this._removeFromScene.bind(this));
         Emitter.on(AppConstants.eventName.playGame, (hardLevel: HardLevel) => {
@@ -126,7 +132,7 @@ export class GameScene extends Container {
         return this._playerScore;
     }
 
-    public update(deltaTime: number) {
+    public update(deltaTime: number): void {
         this._time += deltaTime;
         if (this._time > 1000) {
             this._time -= 1000;
