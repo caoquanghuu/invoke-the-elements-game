@@ -15,8 +15,9 @@ the dropping skills. The game will have 3 hard level for player can chose.
 2. **Server**: Webpack
 
 ### Run project:
-1. **Open webside application**
-2. **Start webpack sever**
+1. **Install pixijs:**
+    -`yarn add pixijs`
+3. **Start webpack sever:**
     -`yarn start`
-3. **Insert link**
+4. **Insert link**
     -`http://localhost:8080/`
